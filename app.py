@@ -76,6 +76,7 @@ def index():
             <ul>
                 <li><a href="/profile">Min profil</a></li>
                 <li><a href="/secret">Hemlig sida (kräver inloggning)</a></li>
+                <li><a href="/skriv">Skriv ett inlägg</a></li> 
                 <li><a href="/session-info">Visa sessionens innehåll</a></li>
                 <li><a href="/logout">Logga ut</a></li>
             </ul>
@@ -117,6 +118,28 @@ def login():
         <p><i>Testa: alice/katt123, bob/hund456, carol/fisk789</i></p>
     '''
 
+@app.route('/skriv', methods=['GET', 'POST'])
+def skriv():
+    
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        text = request.form['text']
+        query(
+            'INSERT INTO posts (topic_id, username, text) VALUES (%s, %s, %s)',
+            (0, session['username'], text)
+        )
+        return 'Inlägget sparades! <a href="/skriv">Skriv ett till</a> | <a href="/">Tillbaka</a>'
+
+    return '''
+        <h1>Skriv ett inlägg</h1>
+        <form method="post">
+            <textarea name="text"></textarea><br>
+            <input type="submit" value="Skicka">
+        </form>
+        <p><a href="/">Tillbaka</a></p>
+    '''
 
 @app.route('/profile')
 def profile():
